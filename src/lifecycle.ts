@@ -6,7 +6,6 @@ interface Cycles {
 export class Lifecycle {
   _config: unknown;
   _cycles!: Cycles;
-  _ended = false;
 
   constructor(config?: unknown) {
     this._config = config;
@@ -21,14 +20,14 @@ export class Lifecycle {
     };
   }
 
-  listener(obj: object) {
-    return new Proxy(obj, {
-      get(target: unknown, prop: string) {
-        // @ts-ignore
-        return target[prop];
-      },
-    });
-  }
+  // listener(obj: object) {
+  //   return new Proxy(obj, {
+  //     get(target: unknown, prop: string) {
+  //       // @ts-ignore
+  //       return target[prop];
+  //     },
+  //   });
+  // }
 
   before(callback: Function) {
     this._cycles.beforeCallbacks.push(callback);
