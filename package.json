@@ -2,7 +2,8 @@
   "name": "fn-lifecycle",
   "version": "0.0.2",
   "description": "",
-  "main": "./build/index.js",
+  "main": "build/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "dev": "npx nodemon",
     "build": "tsc",
@@ -11,8 +12,8 @@
     "test:watch": "jest --watch"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Nir Adler <github@niradler.com>",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.4.0",
     "@types/node": "^18.14.2",
