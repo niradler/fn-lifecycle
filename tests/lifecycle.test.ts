@@ -14,7 +14,7 @@ describe("Lifecycle class", () => {
     lc = new Lifecycle();
   });
 
-  it("decorate a callback", async () => {
+  it("decorate a function", async () => {
     const validate = (name) => {
       if (!name) throw new Error("name is missing");
     };
@@ -24,7 +24,7 @@ describe("Lifecycle class", () => {
     expect(await greet(myName)).toBe(`Hi, ${myName}`);
   });
 
-  it("decorator", async () => {
+  it("class function decorator", async () => {
     const cacheStore = {};
     const checkCache = (s) => {
       if (cacheStore[s]) return cacheStore[s];
@@ -39,13 +39,13 @@ describe("Lifecycle class", () => {
 
     class Test {
       @cache.decorate()
-      get(s: string) {
+      getGreet(s: string) {
         return `Getting ${s}`;
       }
     }
 
     const test = new Test();
-    await test.get("key");
+    await test.getGreet("key");
     expect(cacheStore["key"]).toBe(`Getting key`);
   });
 });
