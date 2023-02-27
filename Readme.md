@@ -1,5 +1,9 @@
 # function lifecycle
 
+Control the before and after of running a function, can be used for validation, caching, data mutation and more.
+
+Function warper:
+
 ```ts
 import { Lifecycle } from "fn-lifecycle";
 
@@ -21,6 +25,8 @@ const myName = "Nir";
 
 await greet(myName); // Hi, Nir
 ```
+
+Using it as a decorator:
 
 ```ts
 import { Lifecycle } from "fn-lifecycle";
