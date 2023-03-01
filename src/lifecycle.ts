@@ -4,38 +4,33 @@ interface Cycles {
 }
 
 export class Lifecycle {
-  _config: unknown;
-  _cycles!: Cycles;
+  config: unknown;
+  cycles!: Cycles;
 
   constructor(config?: unknown) {
-    this._config = config;
+    this.setConfig(config);
     this.setCycles({});
   }
 
-  setCycles(_cycles: Cycles | object = {}) {
-    this._cycles = {
+  setConfig(config?: unknown) {
+    this.config = config;
+  }
+
+  setCycles(cycles: Cycles | object = {}) {
+    this.cycles = {
       beforeCallbacks: [],
       afterCallbacks: [],
-      ..._cycles,
+      ...cycles,
     };
   }
 
-  // listener(obj: object) {
-  //   return new Proxy(obj, {
-  //     get(target: unknown, prop: string) {
-  //       // @ts-ignore
-  //       return target[prop];
-  //     },
-  //   });
-  // }
-
   before(callback: Function) {
-    this._cycles.beforeCallbacks.push(callback);
+    this.cycles.beforeCallbacks.push(callback);
     return this;
   }
 
   after(callback: Function) {
-    this._cycles.afterCallbacks.push(callback);
+    this.cycles.afterCallbacks.push(callback);
     return this;
   }
 
@@ -53,54 +48,41 @@ export class Lifecycle {
     return newValue;
   }
 
-  *getNextCB(type: string, self: Lifecycle) {
-    switch (type) {
-      case "before":
-        for (const cb of self._cycles.beforeCallbacks) {
-          yield cb;
-        }
-        break;
-
-      case "after":
-        for (const cb of self._cycles.afterCallbacks) {
-          yield cb;
-        }
-        break;
+  *getNextCB(cb: Function, self: Lifecycle) {
+    for (const callback of [
+      ...self.cycles.beforeCallbacks,
+      cb,
+      ...self.cycles.afterCallbacks,
+    ]) {
+      yield callback;
     }
 
     return;
   }
 
-  exec(cb: Function) {
+  exec<R>(cb: Function, value: unknown = undefined) {
     const self = this;
-    return async function (...args: unknown[]) {
+    return async function (...args: unknown[]): Promise<R> {
       // @ts-ignore
-      const ctx = this;
-      let value;
+      const ctx = this || {};
 
-      const beforeCallbacks = self.getNextCB("before", self);
-      let nextCB = beforeCallbacks.next();
-      while (nextCB.done !== true && nextCB.value) {
+      const callbacks = self.getNextCB(cb, self);
+      let nextCB = callbacks.next();
+      while (nextCB.done !== true && nextCB.value && ctx.done !== true) {
+        ctx.previousValue = value;
+        ctx.config = self.config;
         value = await self.mutate(value, nextCB.value.apply(ctx, [...args]));
-        nextCB = beforeCallbacks.next();
+
+        nextCB = callbacks.next();
       }
-
-      value = await cb.apply(ctx, args);
-
-      const afterCallbacks = self.getNextCB("after", self);
-      nextCB = afterCallbacks.next();
-      while (nextCB.done !== true && nextCB.value) {
-        value = await self.mutate(value, nextCB.value.apply(ctx, [...args]));
-        nextCB = afterCallbacks.next();
-      }
-
+      // @ts-ignore
       return value;
     };
   }
 
-  decorate(callback?: Function) {
-    const instance = new Lifecycle(this._config);
-    instance.setCycles(this._cycles);
+  decorate<R>(callback?: Function) {
+    const instance = new Lifecycle(this.config);
+    instance.setCycles(this.cycles);
     this.setCycles({});
 
     if (callback) return instance.exec(callback);
@@ -111,7 +93,7 @@ export class Lifecycle {
       descriptor: PropertyDescriptor
     ) {
       callback = descriptor.value;
-      descriptor.value = instance.exec(callback as Function);
+      descriptor.value = instance.exec<R>(callback as Function);
     };
   }
 }
