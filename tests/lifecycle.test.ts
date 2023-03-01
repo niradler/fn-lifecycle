@@ -11,7 +11,7 @@ describe("Lifecycle class", () => {
   let lc: Lifecycle;
 
   beforeAll(async () => {
-    lc = new Lifecycle();
+    lc = new Lifecycle({ name: "config" });
   });
 
   it("exec reuse lc", async () => {
@@ -51,15 +51,23 @@ describe("Lifecycle class", () => {
     }
 
     function addCache(s) {
-      cacheStore[s] = this.previousValue;
+      cacheStore[s] = this._.value;
     }
 
     const cache = lc.before(checkCache).after(addCache);
 
     class Test {
+      config: object;
+      constructor() {
+        this.config = { name: "test" };
+      }
+      log(s: string) {
+        console.log("getGreet running", s, this._.config);
+      }
+
       @cache.decorate()
       async getGreet(s: string) {
-        console.log("getGreet running");
+        this.log(s);
         return `Getting ${s}`;
       }
     }

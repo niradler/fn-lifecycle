@@ -69,8 +69,7 @@ export class Lifecycle {
       const callbacks = self.getNextCB(cb, self);
       let nextCB = callbacks.next();
       while (nextCB.done !== true && nextCB.value && ctx.done !== true) {
-        ctx.previousValue = value;
-        ctx.config = self.config;
+        ctx._ = { config: self.config, value };
         value = await self.mutate(value, nextCB.value.apply(ctx, [...args]));
 
         nextCB = callbacks.next();
