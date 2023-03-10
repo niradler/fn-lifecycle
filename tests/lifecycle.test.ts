@@ -19,9 +19,10 @@ describe("Lifecycle class", () => {
       if (!name) throw new Error("name is missing");
     };
     const addGreet = (name) => `Hi, ${name}`;
-    const greet = lc.before(validate).after(addGreet).exec(whatIsMyName);
+    const greet1 = lc.before(validate).after(addGreet).exec(whatIsMyName);
     const greet2 = lc.exec(whatIsMyName);
     const myName = "Nir";
+    expect(await greet1(myName)).toBe(`Hi, ${myName}`);
     expect(await greet2(myName)).toBe(`Hi, ${myName}`);
   });
 
