@@ -10,7 +10,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "docs": "rimraf ./docs && typedoc ./src/index.ts",
-    "publish-docs": "npm run docs && npx gh-pages -b gh-pages -d docs"
+    "publish-docs": "npm run docs && npx gh-pages -b gh-pages -d docs",
+    "prepublish": "npm run build && npm run test"
   },
   "keywords": [
     "lifecycle",
