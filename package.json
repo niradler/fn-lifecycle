@@ -1,6 +1,6 @@
 {
   "name": "fn-lifecycle",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Control the before and after of running a function, can be used for validation, caching, data mutation and more.",
   "main": "build/index.js",
   "types": "types/index.d.ts",
