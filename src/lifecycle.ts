@@ -62,6 +62,7 @@ export class Lifecycle {
 
   exec<R>(cb: Function, value: unknown = undefined) {
     const self = this;
+    const state = {}
     return async function (...args: unknown[]): Promise<R> {
       // @ts-ignore
       const ctx = this || {};
@@ -69,7 +70,7 @@ export class Lifecycle {
       const callbacks = self.getNextCB(cb, self);
       let nextCB = callbacks.next();
       while (nextCB.done !== true && nextCB.value && ctx.done !== true) {
-        ctx._ = { config: self.config, value };
+        ctx._ = { state, config: self.config, value };
         value = await self.mutate(value, nextCB.value.apply(ctx, [...args]));
 
         nextCB = callbacks.next();

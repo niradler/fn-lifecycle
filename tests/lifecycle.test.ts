@@ -41,6 +41,24 @@ describe("Lifecycle class", () => {
     expect(await greet(myName)).toBe(`Hi, ${myName}`);
   });
 
+  it("state", async () => {
+    function validate(name) {
+      if (!name) throw new Error("name is missing");
+      this._.state.isValid = true;
+    }
+    function addGreet(name) {
+      return this._.state.isValid ? `Hi, ${name}` : "not a valid name";
+    }
+    const greet = lc.before(validate).after(addGreet).decorate(whatIsMyName);
+    const myName = "Nir";
+    try {
+      await greet();
+    } catch (error) {
+      expect(error).toBeDefined();
+    }
+    expect(await greet(myName)).toBe(`Hi, ${myName}`);
+  });
+
   it("class function decorator", async () => {
     const cacheStore = {};
     function checkCache(s) {
